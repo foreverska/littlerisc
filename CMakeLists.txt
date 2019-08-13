@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 enable_testing()
 
+set(CMAKE_C_FLAGS_DEBUG "-g -Og")
+set(CMAKE_C_FLAGS_RELEASE "-O3")
+
 file(GLOB LIB_SOURCES littlerisc/*.c littlerisc/*.h littlerisc/include/*.h)
 add_library(liblittlerisc ${LIB_SOURCES})
 
