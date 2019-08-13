@@ -1,8 +1,12 @@
+ENTRY(_intc00);
+
 SECTIONS
 {
-
 	. = 0x0;
-	.test : { *(.text) }
+	.text : { 
+		*(.text.prologue);
+		*(.text); 
+	}
 	_edata = .;
 	_end = .;
 	
