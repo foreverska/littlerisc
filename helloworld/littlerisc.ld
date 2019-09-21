@@ -10,7 +10,7 @@ SECTIONS
 	_edata = .;
 	_end = .;
 	
-	. = 0x600;
+	. = 0x4000;
 	.data : { *(.data) }
 	.bss : { *(.bss) }
 	__global_pointer$ = .;

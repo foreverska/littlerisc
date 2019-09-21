@@ -11,6 +11,23 @@
     assert(value == csrVal); \
 }
 
+void MachIntTest()
+{
+    int ret;
+    uint32_t value;
+    riscvCore *pCore;
+    uint32_t memory[6] = {0x00000013, 0x00000013, 0x00000013, 0x00000013};
+
+    initCore(&pCore);
+    initMemory(pCore, 2000);
+    loadMemory(pCore, (uint8_t*) memory, 0, sizeof(memory));
+
+    CHECK_CSR(pCore, MIE, MACH_IE);
+
+    destroyMemory(pCore);
+    destroyCore(pCore);
+}
+
 void MachCounterTest()
 {
     int ret;
@@ -143,4 +160,5 @@ int main(int argc, char **argv)
     MachInfoTest();
     MachTrapSetupTest();
     MachCounterTest();
+    MachIntTest();
 }

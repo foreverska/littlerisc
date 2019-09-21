@@ -98,6 +98,11 @@ int coreExecute(riscvCore *pCore)
     int32_t imm, temp;
     uint8_t *pVal;
 
+    if (pCore->mmu.memSize == 0)
+    {
+        return CORE_MEMERR;
+    }
+
     if (pCore->pc%4 != 0)
     {
         return CORE_UNALIGNED;
@@ -434,7 +439,10 @@ void initMemory(riscvCore *pCore, uint32_t size)
 
 void destroyMemory(riscvCore *pCore)
 {
-    free(pCore->mmu.pMemory);
+    if (pCore->mmu.pMemory != NULL)
+    {
+        free(pCore->mmu.pMemory);
+    }
 }
 
 void loadMemory(riscvCore *pCore, uint8_t *pMem, uint32_t loc, uint32_t size)

@@ -7,6 +7,8 @@
 
 #include "littlerisc/include/littlerisc.h"
 
+#define SERIAL_MMIO     0x1000
+
 #define LOAD_OK         0
 #define LOAD_NOK        -1
 
@@ -15,6 +17,7 @@
 
 typedef struct {
     uint64_t perfMon;
+    uint32_t serialAddr;
     char *pFile;
 } progOptions;
 
@@ -80,11 +83,13 @@ void parseOptions(int argc, char **argv, progOptions *pProgOptions)
 {
     int opt;
     size_t temp;
+    int serialAddr;
 
     pProgOptions->perfMon = PERF_MON_DIS;
     pProgOptions->pFile = NULL;
+    pProgOptions->serialAddr = 0;
 
-    while ((opt = getopt(argc, argv, "pf:")) != -1)
+    while ((opt = getopt(argc, argv, "pf:s:")) != -1)
     {
         switch(opt)
         {
@@ -96,6 +101,13 @@ void parseOptions(int argc, char **argv, progOptions *pProgOptions)
             pProgOptions->pFile = malloc(temp);
             assert(pProgOptions->pFile != NULL);
             strncpy(pProgOptions->pFile, optarg, temp);
+            break;
+        case 's':
+            serialAddr = atoi(optarg);
+            if (serialAddr > 0)
+            {
+                pProgOptions->serialAddr = (uint32_t) serialAddr;
+            }
             break;
         default:
             printf("Unrecognized option %c\n", opt);
@@ -113,6 +125,15 @@ void parseOptions(int argc, char **argv, progOptions *pProgOptions)
 void destroyOptions(progOptions *pOptions)
 {
     free(pOptions->pFile);
+}
+
+void serialMmio(riscvCore *pCore, uint32_t serialAddr)
+{
+    if (pCore->mmu.pMemory[serialAddr] != 0)
+    {
+        putchar(pCore->mmu.pMemory[serialAddr]);
+        pCore->mmu.pMemory[serialAddr] = 0;
+    }
 }
 
 int main(int argc, char **argv)
@@ -134,7 +155,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    printf("Memory Loaded\n");
+    printf("Memory Loaded\n\n");
 
     while (ret == CORE_OK)
     {
@@ -145,7 +166,10 @@ int main(int argc, char **argv)
             performanceInfo(pCore);
         }
 
-        printf("Current pc: %x\n", pCore->pc);
+        if (options.serialAddr != 0)
+        {
+            serialMmio(pCore, options.serialAddr);
+        }
     }
 
     printf("Core exited with ret: %d\n", ret);

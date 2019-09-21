@@ -13,6 +13,7 @@ inline int setupCsr(riscvCore *pCore)
     pCore->csr[MARCHID] = UNIMPL;
 
     pCore->csr[MCOUNTEREN] = CY_EN;
+    pCore->csr[MIE] = MACH_IE;
 
     return CSR_OK;
 }
